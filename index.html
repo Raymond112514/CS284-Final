@@ -74,7 +74,7 @@
 
 
   <!-- TODO: Replace with your paper title and authors -->
-  <title>PAPER_TITLE - AUTHOR_NAMES | Academic Research</title>
+  <title>CS284 Final Project</title>
   
   <!-- Favicon and App Icons -->
   <link rel="icon" type="image/x-icon" href="static/images/favicon.ico">
@@ -100,6 +100,7 @@
   
   <!-- Fonts - Optimized loading -->
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
   
   <!-- Defer non-critical JavaScript -->
   <script defer src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
@@ -107,6 +108,8 @@
   <script defer src="static/js/fontawesome.all.min.js"></script>
   <script defer src="static/js/bulma-carousel.min.js"></script>
   <script defer src="static/js/bulma-slider.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"></script>
   <script defer src="static/js/index.js"></script>
   
   <!-- Structured Data for Academic Papers -->
@@ -235,6 +238,133 @@
   </div>
 
   <main id="main-content">
+  <header class="project-header">
+    <nav class="project-tabs" role="tablist" aria-label="Project sections">
+      <button type="button" class="project-tab" role="tab" id="tab-proposal" data-tab="proposal" aria-controls="panel-proposal" aria-selected="true">Proposal</button>
+      <button type="button" class="project-tab" role="tab" id="tab-milestone" data-tab="milestone" aria-controls="panel-milestone" aria-selected="false" tabindex="-1">Milestone</button>
+      <button type="button" class="project-tab" role="tab" id="tab-final" data-tab="final" aria-controls="panel-final" aria-selected="false" tabindex="-1">Final Project</button>
+    </nav>
+  </header>
+
+  <div id="panel-proposal" class="tab-panel" role="tabpanel" aria-labelledby="tab-proposal" data-tab="proposal">
+    <section class="section">
+      <div class="container is-max-desktop">
+        <h1 class="title is-1 publication-title has-text-centered">Project Proposal</h1>
+        <div class="content writeup">
+          <h2>Summary</h2>
+          <p>In our project, we aim to speed up 3D Gaussian Splatting for smoothly moving cameras without introducing visible popping artifacts. Building on the work <a href="https://arxiv.org/pdf/2402.00525" target="_blank" rel="noopener">StopThePop</a>, we propose to use information from nearby camera frames to adaptively determine which image regions require accurate hierarchical sorting and which can use a cheaper sorting method.</p>
+
+          <h2>Problem Description</h2>
+          <p>In augmented and virtual reality, virtual tours, and robotic teleoperation, users often need to smoothly navigate through reconstructed 3D scenes, which requires rendering a sequence of images from continuously changing camera viewpoints. 3D Gaussian Splatting (3DGS) enables real-time novel-view rendering, but requires sorting Gaussians by depth at each frame. Repeating this sorting process can introduce redundant computation, especially when the camera moves only slightly. Moreover, standard 3DGS approximates Gaussian depth using the center of each Gaussian. This can lead to incorrect blending orders that change abruptly as the camera moves, producing visible popping artifacts and reducing temporal consistency.</p>
+          <p>Recent work has addressed these two challenges separately. <a href="https://arxiv.org/pdf/2511.12930" target="_blank" rel="noopener">Neo</a>, for instance, reuses previously sorted Gaussian lists across consecutive frames to reduce computation. However, it retains the approximate depth ordering of standard 3DGS and therefore is still prone to popping artifacts. StopThePop, on the other hand, introduces a more accurate hierarchical per-pixel sorting scheme to reduce popping artifacts, but processes each frame independently.</p>
+          <p>Motivated by these works, our goal is to investigate whether we can combine the advantages of both approaches. Intuitively, if we run StopThePop's accurate hierarchical sorting at frame <em>t</em>, and the camera moves only slightly in the next frame, we expect the sorting requirements to remain similar. We can therefore use information from the previous frame to adaptively determine which image regions require accurate hierarchical sorting and which can use a cheaper sorting method.</p>
+
+          <h2>Goals and Deliverables</h2>
+          <p>Our approach is to avoid performing StopThePop's hierarchical sorting independently for every frame. Below gives an overview of our proposed method.</p>
+          <ul>
+            <li><strong>Frame t:</strong> Run StopThePop's hierarchical sorting algorithm. For each image patch, we estimate its sorting difficulty by comparing the initial approximate Gaussian ordering with the final per-pixel ordering, using a metric such as inversion rate.</li>
+            <li><strong>Frame t+1:</strong> We reuse the previous frame's patch-level difficulty scores to predict which regions require accurate sorting. In particular, for patches with low sorting difficulty, we use the simpler Gaussian center-depth sorting from standard 3DGS, while for patches with high sorting difficulty, we apply StopThePop's full hierarchical sorting.</li>
+            <li><strong>Periodic updates:</strong> We periodically run full hierarchical sorting to refresh the difficulty scores, especially after significant camera movements.</li>
+          </ul>
+
+          <h3>What we plan to deliver</h3>
+          <ul>
+            <li>A working prototype with per-tile selection between cheap sorting and StopThePop's hierarchy, tested on pretrained scenes and smooth camera paths.</li>
+            <li>Side-by-side camera fly-throughs and heatmaps showing where accurate sorting is selected.</li>
+            <li>We will compare the rendering time and image quality of our method against standard 3DGS and StopThePop. We will also measure the rendering time of both the cheap and accurate sorting paths to determine whether adaptive sorting provides meaningful speedups.</li>
+          </ul>
+
+          <h3>What we hope to deliver</h3>
+          <ul>
+            <li>A polished interactive viewer with a quality threshold slider and live performance statistics.</li>
+          </ul>
+
+          <h2>Schedule</h2>
+          <ul>
+            <li><strong>Week 1:</strong> Set up StopThePop and pretrained scenes; render camera paths; measure which tiles benefit from accurate sorting and test a cheap rendering path.</li>
+            <li><strong>Week 2:</strong> Implement cheap/full sorting for individual tiles and an initial difficulty-based selection rule.</li>
+            <li><strong>Week 3:</strong> Reuse difficulty scores across nearby camera frames; handle camera movement and refreshes.</li>
+            <li><strong>Week 4:</strong> Evaluate speed and popping, create the visual demo, and complete the report and presentation.</li>
+          </ul>
+
+          <h2>Resources</h2>
+          <p>We have access to an NVIDIA CUDA-capable GPU, and the implementations of both StopThePop and Neo are publicly available. We plan to build on these existing codebases for implementation and evaluation.</p>
+
+          <h2>References</h2>
+          <ul>
+            <li>Neo — <a href="https://arxiv.org/pdf/2511.12930" target="_blank" rel="noopener">https://arxiv.org/pdf/2511.12930</a></li>
+            <li>StopThePop — <a href="https://arxiv.org/pdf/2402.00525" target="_blank" rel="noopener">https://arxiv.org/pdf/2402.00525</a></li>
+          </ul>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <div id="panel-milestone" class="tab-panel" role="tabpanel" aria-labelledby="tab-milestone" data-tab="milestone" hidden>
+    <section class="section">
+      <div class="container is-max-desktop">
+        <h1 class="title is-1 publication-title has-text-centered">Project Milestone</h1>
+        <div class="content writeup">
+          <h2>Abstract</h2>
+          <p>Standard 3D Gaussian Splatting (3DGS) enables real-time rendering but suffers from popping artifacts due to approximate depth sorting. <a href="https://arxiv.org/pdf/2402.00525" target="_blank" rel="noopener">StopThePop</a> addresses this issue by introducing a hierarchical sorting scheme that provides more accurate depth ordering at additional computational cost. In this project, we investigate whether accurate sorting can be applied adaptively, focusing computational effort on visually sensitive regions.</p>
+          <p>Our preliminary results show that sorting-sensitive regions are spatially concentrated and temporally consistent, enabling adaptive sorting that balances rendering quality and efficiency. We also explore distilling StopThePop's rendering quality into pretrained Gaussian representations to reduce popping artifacts using vanilla 3DGS at inference time.</p>
+
+          <h2>Technical Approach</h2>
+          <p>Our approach builds upon the official StopThePop codebase. We modified its CUDA rasterizer to support tile-level adaptive sorting, allowing each 16×16 image tile to use either vanilla 3DGS sorting or StopThePop's hierarchical sorting.</p>
+          <p>In our initial experiments, we observed that regions requiring accurate sorting tend to persist across nearby camera viewpoints. Motivated by this observation, we render the initial camera view using both vanilla 3DGS and StopThePop and compute their per-pixel RGB differences. We then identify the 20% of tiles with the highest average error as regions requiring accurate sorting, producing a binary selection mask. For subsequent frames, we warp the error map according to camera motion and update the mask to select tiles for hierarchical sorting. This allows us to reuse information from previous frames rather than recomputing the sorting difficulty for every new viewpoint.</p>
+
+          <h2>Preliminary Results</h2>
+          <h3>Benchmarking StopThePop</h3>
+          <p>As a first step, we investigated how sorting-sensitive regions are distributed spatially and temporally across nearby camera views. We found that rendering differences are highly concentrated. In particular, the top 20% of tiles account for 72% of the total squared difference on Train and 79% on Playroom. Moreover, these regions remain relatively consistent across nearby camera frames.</p>
+          <p>We next investigated which metrics could predict which tiles are likely to exhibit popping artifacts in subsequent frames. We considered two metrics computed from an earlier frame: sorting-error statistics and the mean squared error (MSE) between vanilla 3DGS and StopThePop renderings. Interestingly, sorting-error statistics correlate poorly with actual rendering differences, whereas MSE provides a much stronger predictor. Using the previous frame's MSE map, we can identify 97% and 96% of the highest-error tiles in the next frame on Train and Playroom, respectively. Even 16 frames later, recall remains at 88% and 79% when compensating for camera motion using optical flow. These findings motivate our approach of reusing and warping previous-frame error maps for adaptive sorting.</p>
+          <figure class="writeup-figure">
+            <img src="static/videos/metric.png" alt="Recall of future high-error tiles versus frames apart on Train and Playroom for sorting error, render MSE, and warped render MSE.">
+            <figcaption>Recall of future high-error tiles on Train and Playroom. </figcaption>
+          </figure>
+
+          <h3>Adaptive sorting and timing</h3>
+          <p>We evaluated the adaptive sorting algorithm described above, as shown in the videos below. Although our method reduces popping artifacts compared to vanilla 3DGS, the binary masking scheme introduces noticeable discontinuities at the boundaries between the two sorting methods. One potential solution is to blend the rendering results near mask boundaries or adopt a more gradual sorting strategy.</p>
+          <video class="writeup-video" controls playsinline preload="metadata">
+            <source src="static/videos/train_adaptive.mp4" type="video/mp4">
+          </video>
+          <p>We also benchmarked the rendering time of our adaptive algorithm and found that its performance generally falls between vanilla 3DGS and full StopThePop, as expected. Increasing the fraction of tiles using hierarchical sorting improves rendering quality at the cost of additional computation.</p>
+
+          <h3>Alternative direction: renderer distillation</h3>
+          <p>We also explored whether StopThePop's rendering quality can be distilled into a pretrained Gaussian representation. In particular, given a pretrained scene, we render multiple camera views using StopThePop and use these images as supervision to fine-tune the Gaussian parameters. Specifically, we minimize the mean squared error (MSE) between the images rendered by vanilla 3DGS and the corresponding StopThePop reference images:</p>
+          <div class="equation">
+            $$\mathcal{L}(\theta)=\frac{1}{N}\sum_{i=1}^{N}\left|R_{\mathrm{3DGS}}(\theta,c_i)-R_{\mathrm{StopThePop}}(\theta_0,c_i)\right|_2^2$$
+          </div>
+          <p>where \(\theta_0, \theta\) denotes the pretrained and finetuned Gaussian parameters, and \(c_i\) denotes the sampled camera viewpoints. This approach shifts the computational burden from inference to offline training. Our goal is to achieve StopThePop-like rendering quality using only the faster vanilla 3DGS renderer at inference time.</p>
+          <p>We found that fine-tuning Gaussian representations using StopThePop-rendered images can reduce popping artifacts when rendered with vanilla 3DGS. Moving forward, we aim to explore additional optimization techniques (e.g. Gaussian splitting and densification) to further improve rendering quality.</p>
+          <video class="writeup-video" controls playsinline preload="metadata">
+            <source src="static/videos/distillation.mp4" type="video/mp4">
+          </video>
+
+          <h2>Evaluation Plan</h2>
+          <p>To evaluate the effectiveness of our methods, we will measure PSNR and SSIM against StopThePop-rendered reference images, allowing us to quantify how closely our methods approximate StopThePop's rendering quality. We will also evaluate temporal consistency by measuring motion-compensated frame-to-frame differences to identify popping artifacts.</p>
+          <p>Finally, we will compare rendering times across vanilla 3DGS, StopThePop, and our proposed methods to assess the tradeoff between rendering quality and computational efficiency.</p>
+
+          <h2>Updated Plan</h2>
+          <ul>
+            <li><strong>Week 1 (Nov. 23–29):</strong>
+              <ul>
+                <li>Improve adaptive sorting by exploring blending and gradual sorting strategies to reduce boundary artifacts.</li>
+                <li>Further investigate renderer distillation, including Gaussian splitting and densification, and evaluate performance on more held-out camera trajectories.</li>
+              </ul>
+            </li>
+            <li><strong>Week 2 (Nov. 30–Dec. 6):</strong>
+              <ul>
+                <li>Conduct comprehensive evaluations across multiple scenes.</li>
+                <li>Finalize rendering demonstrations and prepare the final report and project website.</li>
+              </ul>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <div id="panel-final" class="tab-panel" role="tabpanel" aria-labelledby="tab-final" data-tab="final" hidden>
   <section class="hero">
     <div class="hero-body">
       <div class="container is-max-desktop">
@@ -405,7 +535,7 @@
           
           <div class="publication-video">
             <!-- TODO: Replace with your YouTube video ID -->
-            <iframe src="https://www.youtube.com/embed/JkaxUblCGz0" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>
+            <iframe data-src="https://www.youtube.com/embed/JkaxUblCGz0" title="Video presentation" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>
           </div>
         </div>
       </div>
@@ -490,7 +620,8 @@
     </div>
 </section>
 <!--End BibTex citation -->
-
+  </div>
+  </main>
 
   <footer class="footer">
   <div class="container">

@@ -732,6 +732,169 @@ a:focus {
 }
 
 
+/* Project section tabs */
+.project-header {
+  position: sticky;
+  top: 0;
+  z-index: 40;
+  background: rgba(255, 255, 255, 0.94);
+  backdrop-filter: saturate(180%) blur(12px);
+  border-bottom: 1px solid var(--border-color);
+  padding: 0 11rem;
+}
+
+.project-tabs {
+  display: flex;
+  justify-content: center;
+  gap: 0.25rem;
+  max-width: 640px;
+  margin: 0 auto;
+}
+
+.project-tab {
+  flex: 1 1 0;
+  min-width: 0;
+  appearance: none;
+  background: transparent;
+  border: none;
+  border-bottom: 3px solid transparent;
+  border-radius: 10px 10px 0 0;
+  padding: 1rem 0.75rem 0.8rem;
+  font-family: 'Inter', sans-serif;
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  cursor: pointer;
+  white-space: nowrap;
+  transition: color 0.2s ease, background 0.2s ease, border-color 0.2s ease;
+}
+
+.project-tab:hover {
+  color: var(--text-primary);
+  background: var(--background-accent);
+}
+
+.project-tab[aria-selected="true"] {
+  color: var(--primary-color);
+  border-bottom-color: var(--primary-color);
+}
+
+.project-tab:focus-visible {
+  outline: 2px solid var(--primary-color);
+  outline-offset: -2px;
+}
+
+.tab-panel[hidden] {
+  display: none !important;
+}
+
+.writeup,
+.writeup h2,
+.writeup h3,
+.writeup p,
+.writeup li {
+  color: var(--text-primary);
+}
+
+.writeup h2 {
+  font-size: 1.45rem;
+  font-weight: 700;
+  margin-top: 2.4rem;
+  margin-bottom: 0.75rem;
+}
+
+.writeup h2:first-of-type {
+  margin-top: 0.25rem;
+}
+
+.writeup h3 {
+  font-size: 1.12rem;
+  font-weight: 600;
+  margin-top: 1.6rem;
+  margin-bottom: 0.5rem;
+}
+
+.writeup p,
+.writeup li {
+  line-height: 1.7;
+}
+
+.writeup a {
+  font-weight: 600;
+}
+
+.writeup-video {
+  display: block;
+  width: 100%;
+  margin: 1.25rem 0 1.5rem;
+  border-radius: var(--border-radius-lg);
+  background: #0f172a;
+}
+
+.writeup figure.writeup-figure {
+  width: min(100%, 640px);
+  margin: 1.25rem auto 1.5rem;
+}
+
+.writeup-figure img {
+  display: block;
+  width: 100%;
+  height: auto;
+  border-radius: var(--border-radius);
+  background: #fff;
+}
+
+.writeup-figure figcaption {
+  margin-top: 0.65rem;
+  text-align: center;
+  color: var(--text-secondary);
+  font-size: 0.95rem;
+  line-height: 1.5;
+}
+
+.writeup .equation {
+  margin: 1.25rem 0;
+  padding: 0.75rem 1.25rem;
+  background: var(--background-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius);
+  text-align: center;
+  color: var(--text-primary);
+  overflow-x: auto;
+}
+
+.writeup .equation .katex,
+.writeup .katex {
+  color: var(--text-primary);
+}
+
+.writeup .equation .katex-display {
+  margin: 0.4rem 0;
+}
+
+@media screen and (max-width: 768px) {
+  .writeup .equation {
+    font-size: 0.78rem;
+    padding: 0.6rem 0.4rem;
+  }
+}
+
+@media screen and (max-width: 768px) {
+  .project-header {
+    padding: 0;
+  }
+
+  .project-tabs {
+    gap: 0;
+    max-width: none;
+  }
+
+  .project-tab {
+    font-size: clamp(0.78rem, 3.5vw, 0.95rem);
+    padding: 0.85rem 0.2rem 0.7rem;
+  }
+}
+
 /* Print styles */
 @media print {
   .more-works-container {

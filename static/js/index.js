@@ -119,24 +119,149 @@ function setupVideoCarouselAutoplay() {
     });
 }
 
-$(document).ready(function() {
-    // Check for click events on the navbar burger icon
+var PROJECT_TABS = ['proposal', 'milestone', 'final'];
 
-    var options = {
-		slidesToScroll: 1,
-		slidesToShow: 1,
-		loop: true,
-		infinite: true,
-		autoplay: true,
-		autoplaySpeed: 5000,
+function pausePanelMedia(panel) {
+    panel.querySelectorAll('video').forEach(function(video) {
+        video.pause();
+    });
+    panel.querySelectorAll('iframe[data-src]').forEach(function(frame) {
+        if (frame.src && frame.src !== 'about:blank') {
+            frame.src = 'about:blank';
+        }
+    });
+}
+
+function resumePanelMedia(panel) {
+    panel.querySelectorAll('iframe[data-src]').forEach(function(frame) {
+        if (frame.src !== frame.dataset.src) {
+            frame.src = frame.dataset.src;
+        }
+    });
+}
+
+function layoutCarousels() {
+    if (!window.__projectCarousels) {
+        window.__projectCarousels = bulmaCarousel.attach('.carousel', {
+            slidesToScroll: 1,
+            slidesToShow: 1,
+            loop: true,
+            infinite: true,
+            autoplay: true,
+            autoplaySpeed: 5000,
+        });
+        setupVideoCarouselAutoplay();
+        return;
     }
 
-	// Initialize all div with carousel class
-    var carousels = bulmaCarousel.attach('.carousel', options);
-	
-    bulmaSlider.attach();
-    
-    // Setup video autoplay for carousel
-    setupVideoCarouselAutoplay();
+    window.__projectCarousels.forEach(function(carousel) {
+        if (carousel && typeof carousel._setDimensions === 'function') {
+            carousel._setDimensions();
+        }
+    });
+}
 
+function showProjectTab(tabId, options) {
+    options = options || {};
+    if (PROJECT_TABS.indexOf(tabId) === -1) {
+        tabId = 'proposal';
+    }
+
+    document.querySelectorAll('.project-tab').forEach(function(tab) {
+        var selected = tab.dataset.tab === tabId;
+        tab.setAttribute('aria-selected', selected ? 'true' : 'false');
+        tab.tabIndex = selected ? 0 : -1;
+    });
+
+    document.querySelectorAll('.tab-panel').forEach(function(panel) {
+        var active = panel.dataset.tab === tabId;
+        panel.hidden = !active;
+        if (active) {
+            resumePanelMedia(panel);
+        } else {
+            pausePanelMedia(panel);
+        }
+    });
+
+    if (tabId === 'final') {
+        layoutCarousels();
+    }
+
+    if (options.updateHash) {
+        var nextHash = '#' + tabId;
+        if (location.hash !== nextHash) {
+            history.pushState({ tab: tabId }, '', nextHash);
+        }
+    }
+
+    if (options.scroll) {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+}
+
+function initProjectTabs() {
+    var tablist = document.querySelector('.project-tabs');
+    if (!tablist) return;
+
+    tablist.addEventListener('click', function(event) {
+        var tab = event.target.closest('.project-tab');
+        if (!tab) return;
+        showProjectTab(tab.dataset.tab, { updateHash: true, scroll: true });
+    });
+
+    tablist.addEventListener('keydown', function(event) {
+        var tabs = Array.prototype.slice.call(tablist.querySelectorAll('.project-tab'));
+        var index = tabs.indexOf(document.activeElement);
+        if (index === -1) return;
+
+        var nextIndex = null;
+        if (event.key === 'ArrowRight') nextIndex = (index + 1) % tabs.length;
+        if (event.key === 'ArrowLeft') nextIndex = (index - 1 + tabs.length) % tabs.length;
+        if (event.key === 'Home') nextIndex = 0;
+        if (event.key === 'End') nextIndex = tabs.length - 1;
+        if (nextIndex === null) return;
+
+        event.preventDefault();
+        tabs[nextIndex].focus();
+        showProjectTab(tabs[nextIndex].dataset.tab, { updateHash: true, scroll: false });
+    });
+
+    window.addEventListener('popstate', function() {
+        var tabId = (location.hash || '#proposal').replace('#', '');
+        showProjectTab(tabId, { updateHash: false, scroll: true });
+    });
+
+    var initial = (location.hash || '#proposal').replace('#', '');
+    showProjectTab(initial, { updateHash: false, scroll: false });
+}
+
+function renderPageMath() {
+    if (!window.renderMathInElement) return;
+
+    var options = {
+        delimiters: [
+            {left: '$$', right: '$$', display: true},
+            {left: '\\(', right: '\\)', display: false}
+        ],
+        throwOnError: false
+    };
+
+    document.querySelectorAll('.tab-panel').forEach(function(panel) {
+        var wasHidden = panel.hidden;
+        panel.hidden = false;
+        renderMathInElement(panel, options);
+        panel.hidden = wasHidden;
+    });
+
+    if (document.fonts && document.fonts.load) {
+        document.fonts.load('1em KaTeX_Main');
+        document.fonts.load('1em KaTeX_Math');
+        document.fonts.load('1em KaTeX_Caligraphic');
+    }
+}
+
+$(document).ready(function() {
+    bulmaSlider.attach();
+    initProjectTabs();
+    renderPageMath();
 })
