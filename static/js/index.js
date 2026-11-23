@@ -199,6 +199,29 @@ function showProjectTab(tabId, options) {
     }
 }
 
+function tabForHash(hash) {
+    var id = (hash || '#proposal').replace('#', '');
+    if (PROJECT_TABS.indexOf(id) !== -1) return id;
+
+    var target = document.getElementById(id);
+    if (target) {
+        var panel = target.closest('.tab-panel');
+        if (panel && PROJECT_TABS.indexOf(panel.dataset.tab) !== -1) {
+            return panel.dataset.tab;
+        }
+    }
+    return 'proposal';
+}
+
+function scrollToHashTarget() {
+    var id = (location.hash || '').replace('#', '');
+    if (!id || PROJECT_TABS.indexOf(id) !== -1) return;
+    var target = document.getElementById(id);
+    if (target) {
+        target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+}
+
 function initProjectTabs() {
     var tablist = document.querySelector('.project-tabs');
     if (!tablist) return;
@@ -227,12 +250,16 @@ function initProjectTabs() {
     });
 
     window.addEventListener('popstate', function() {
-        var tabId = (location.hash || '#proposal').replace('#', '');
-        showProjectTab(tabId, { updateHash: false, scroll: true });
+        showProjectTab(tabForHash(location.hash), { updateHash: false, scroll: true });
     });
 
-    var initial = (location.hash || '#proposal').replace('#', '');
-    showProjectTab(initial, { updateHash: false, scroll: false });
+    window.addEventListener('hashchange', function() {
+        showProjectTab(tabForHash(location.hash), { updateHash: false, scroll: false });
+        scrollToHashTarget();
+    });
+
+    showProjectTab(tabForHash(location.hash), { updateHash: false, scroll: false });
+    scrollToHashTarget();
 }
 
 function renderPageMath() {

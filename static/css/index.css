@@ -823,6 +823,14 @@ a:focus {
   font-weight: 600;
 }
 
+.milestone-links {
+  margin: -0.5rem 0 2rem;
+}
+
+#milestone-videos {
+  scroll-margin-top: 5.5rem;
+}
+
 .writeup-video {
   display: block;
   width: 100%;

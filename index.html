@@ -250,6 +250,15 @@
     <section class="section">
       <div class="container is-max-desktop">
         <h1 class="title is-1 publication-title has-text-centered">Project Proposal</h1>
+        <div class="is-size-5 publication-authors has-text-centered">
+          <span class="author-block">Noah Steigler,</span>
+          <span class="author-block">Raymond Tsao,</span>
+          <span class="author-block">Ria Jain,</span>
+          <span class="author-block">Nikko Adrian Pacleb</span>
+        </div>
+        <div class="is-size-5 publication-authors has-text-centered">
+          <span class="author-block">University of California, Berkeley</span>
+        </div>
         <div class="content writeup">
           <h2>Summary</h2>
           <p>In our project, we aim to speed up 3D Gaussian Splatting for smoothly moving cameras without introducing visible popping artifacts. Building on the work <a href="https://arxiv.org/pdf/2402.00525" target="_blank" rel="noopener">StopThePop</a>, we propose to use information from nearby camera frames to adaptively determine which image regions require accurate hierarchical sorting and which can use a cheaper sorting method.</p>
@@ -304,6 +313,46 @@
     <section class="section">
       <div class="container is-max-desktop">
         <h1 class="title is-1 publication-title has-text-centered">Project Milestone</h1>
+        <div class="is-size-5 publication-authors has-text-centered">
+          <span class="author-block">Noah Steigler,</span>
+          <span class="author-block">Raymond Tsao,</span>
+          <span class="author-block">Ria Jain,</span>
+          <span class="author-block">Nikko Adrian Pacleb</span>
+        </div>
+        <div class="is-size-5 publication-authors has-text-centered">
+          <span class="author-block">University of California, Berkeley</span>
+        </div>
+        <div class="has-text-centered milestone-links">
+          <div class="publication-links">
+            <span class="link-block">
+              <a href="static/milestone/milestone.pdf" target="_blank" rel="noopener"
+              class="external-link button is-normal is-rounded is-dark">
+                <span class="icon">
+                  <i class="fas fa-file-pdf"></i>
+                </span>
+                <span>Paper</span>
+              </a>
+            </span>
+            <span class="link-block">
+              <a href="https://docs.google.com/presentation/d/1fbwPA8izYBRMAyMp7fQGSnce8q37pGUCqxi0wuOYv-8/edit?usp=sharing" target="_blank" rel="noopener"
+              class="external-link button is-normal is-rounded is-dark">
+                <span class="icon">
+                  <i class="fas fa-file-powerpoint"></i>
+                </span>
+                <span>Slides</span>
+              </a>
+            </span>
+            <span class="link-block">
+              <a href="#milestone-videos"
+              class="external-link button is-normal is-rounded is-dark">
+                <span class="icon">
+                  <i class="fas fa-video"></i>
+                </span>
+                <span>Videos</span>
+              </a>
+            </span>
+          </div>
+        </div>
         <div class="content writeup">
           <h2>Abstract</h2>
           <p>Standard 3D Gaussian Splatting (3DGS) enables real-time rendering but suffers from popping artifacts due to approximate depth sorting. <a href="https://arxiv.org/pdf/2402.00525" target="_blank" rel="noopener">StopThePop</a> addresses this issue by introducing a hierarchical sorting scheme that provides more accurate depth ordering at additional computational cost. In this project, we investigate whether accurate sorting can be applied adaptively, focusing computational effort on visually sensitive regions.</p>
@@ -324,7 +373,7 @@
 
           <h3>Adaptive sorting and timing</h3>
           <p>We evaluated the adaptive sorting algorithm described above, as shown in the videos below. Although our method reduces popping artifacts compared to vanilla 3DGS, the binary masking scheme introduces noticeable discontinuities at the boundaries between the two sorting methods. One potential solution is to blend the rendering results near mask boundaries or adopt a more gradual sorting strategy.</p>
-          <video class="writeup-video" controls playsinline preload="metadata">
+          <video id="milestone-videos" class="writeup-video" controls playsinline preload="metadata">
             <source src="static/videos/train_adaptive.mp4" type="video/mp4">
           </video>
           <p>We also benchmarked the rendering time of our adaptive algorithm and found that its performance generally falls between vanilla 3DGS and full StopThePop, as expected. Increasing the fraction of tiles using hierarchical sorting improves rendering quality at the cost of additional computation.</p>
